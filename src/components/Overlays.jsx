@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { COLORS, SIZES, DELIVERY, SPECS, fmt, recommendSize, PRODUCTS, WA_PHONE, T } from '../data'
+import { COLORS, SIZES, DELIVERY, SPECS, fmt, recommendSize, PRODUCTS, T } from '../data'
 
 export function Panel({ open, onClose, side = 'right', title, children }) {
   return (
@@ -45,7 +45,7 @@ export function ProductDrawer({ sel, lang, onClose, setColor, onAdd, openSize, s
                   onClick={() => setImgIdx(i)}
                   className={`w-14 aspect-[4/5] bg-card shrink-0 border ${imgIdx === i ? 'border-ink' : 'border-transparent opacity-60 hover:opacity-100'}`}
                 >
-                  <img src={src} alt="" className="w-full h-full object-contain p-1 mix-blend-multiply" />
+                  <img src={src} alt="" className="w-full h-full object-contain p-1 brightness-[1.06] contrast-[1.04] mix-blend-multiply" />
                 </button>
               ))}
             </div>
@@ -75,7 +75,9 @@ export function ProductDrawer({ sel, lang, onClose, setColor, onAdd, openSize, s
 
           <div className="flex justify-between mt-5 mb-2 micro">
             <span>Размер</span>
-            <button onClick={openSize} className="underline underline-offset-4">{t.size}</button>
+            <button onClick={openSize} className="underline underline-offset-4 flex items-center gap-1.5">
+              <span>{t.size}</span>
+            </button>
           </div>
           <div className="grid grid-cols-4 gap-2">
             {SIZES.map((s) => (
@@ -140,16 +142,14 @@ export function SizeModal({ open, onClose, product, onAdd, onSelectOnly }) {
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
       <div onClick={onClose} className="absolute inset-0 bg-black/50 backdrop-blur-xs" />
       <div className="relative bg-white w-full max-w-[440px] max-h-[92vh] flex flex-col overflow-hidden border border-black/10">
-        {/* Header */}
         <div className="flex items-center justify-between px-5 h-13 py-3.5 border-b border-black/10">
           <span className="micro tracking-[0.18em]">SIZE ADVISOR</span>
           <button onClick={onClose} className="text-xl leading-none" aria-label="Закрыть">×</button>
         </div>
 
         <div className="p-5 overflow-y-auto flex-1">
-          {/* Карточка выбранного товара */}
           <div className="flex items-center gap-3 bg-[#F6F5F2] p-2.5 mb-4">
-            <img src={thumb} alt={target.name} className="w-11 h-11 object-contain bg-white mix-blend-multiply p-0.5 shrink-0" />
+            <img src={thumb} alt={target.name} className="w-11 h-11 object-contain bg-white brightness-[1.06] contrast-[1.04] mix-blend-multiply p-0.5 shrink-0" />
             <div className="flex-1 min-w-0">
               {!product ? (
                 <select value={pid} onChange={(e) => setPid(e.target.value)} className="w-full bg-transparent text-xs font-semibold outline-none">
@@ -162,7 +162,6 @@ export function SizeModal({ open, onClose, product, onAdd, onSelectOnly }) {
             </div>
           </div>
 
-          {/* 3-step progress bar */}
           <div className="grid grid-cols-3 gap-1.5 mb-2">
             {[1, 2, 3].map((i) => (
               <div key={i} className={`h-0.5 ${step >= i ? 'bg-ink' : 'bg-black/15'}`} />
@@ -267,7 +266,6 @@ export function SizeModal({ open, onClose, product, onAdd, onSelectOnly }) {
           )}
         </div>
 
-        {/* Footer buttons */}
         <div className="p-5 pt-3 border-t border-black/10 space-y-2">
           {step < 3 && (
             <button onClick={() => setStep((s) => s + 1)} className="w-full h-12 bg-ink text-white micro">
@@ -310,56 +308,116 @@ export function SizeModal({ open, onClose, product, onAdd, onSelectOnly }) {
   )
 }
 
-export function CartDrawer({ open, lang, onClose, items, setQty, delivery, setDelivery }) {
+export function CartDrawer({ open, lang, onClose, items, setQty, delivery, setDelivery, onAddQuick, onCheckout }) {
   const sub = items.reduce((s, i) => s + i.p.price * i.qty, 0)
+  const FREE_SHIP = 50000
+  const leftForFree = Math.max(0, FREE_SHIP - sub)
+  const pct = Math.min(100, Math.round((sub / FREE_SHIP) * 100))
+
   const d = DELIVERY.find((x) => x.id === delivery)
-  const total = sub + (items.length ? d.price : 0)
-  const order = () => {
-    const lines = items.map((i, n) => `${n + 1}. ${i.p.name} — ${COLORS[i.color].label[lang]}, ${i.size} × ${i.qty} = ${fmt(i.p.price * i.qty)}`)
-    const text = ['Здравствуйте! Хочу оформить заказ TUMARU:', '', ...lines, '', `Доставка: ${d.label[lang]} (${fmt(d.price)})`, `Итого: ${fmt(total)}`].join('\n')
-    window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(text)}`, '_blank')
-  }
+  const shipFee = items.length ? (sub >= FREE_SHIP && delivery !== 'world' ? 0 : d.price) : 0
+  const total = sub + shipFee
+
+  const suggestions = PRODUCTS.filter((p) => !items.some((i) => i.p.id === p.id)).slice(0, 3)
+
   return (
-    <Panel open={open} onClose={onClose} title={`Корзина (${items.reduce((s, i) => s + i.qty, 0)})`}>
+    <Panel open={open} onClose={onClose} title={`ВАША КОРЗИНА (${items.reduce((s, i) => s + i.qty, 0)})`}>
       <div className="flex flex-col h-full">
-        <div className="flex-1 p-5 space-y-4">
+        {/* Прогресс бесплатной доставки как на 2-м скриншоте Represent */}
+        <div className="px-5 pt-3 pb-3 border-b border-black/10">
+          <div className="h-1 bg-black/10 w-full mb-2.5 overflow-hidden">
+            <div className="h-full bg-[#198754] transition-all duration-300" style={{ width: `${pct}%` }} />
+          </div>
+          <p className="text-xs">
+            {leftForFree > 0 ? (
+              <>До <b>бесплатной доставки</b> осталось <b>{fmt(leftForFree)}</b></>
+            ) : (
+              <>Вам доступна <b>бесплатная доставка</b> по Казахстану ✓</>
+            )}
+          </p>
+        </div>
+
+        <div className="px-5 py-2.5 border-b border-black/10 flex items-center justify-between text-xs text-black/70">
+          <span>🇰🇿 Отправка напрямую со склада в Алматы</span>
+          <span>›</span>
+        </div>
+
+        <div className="flex-1 p-5 space-y-5">
           {!items.length && <p className="micro text-black/40 pt-10 text-center">Корзина пуста</p>}
           {items.map((i) => {
             const thumb = i.p.images[i.color]?.[0] || i.p.images[i.p.colors[0]][0]
             return (
-              <div key={i.key} className="flex gap-3">
-                <div className="w-20 aspect-[4/5] bg-card relative shrink-0">
-                  <img src={thumb} alt={i.p.name} className="absolute inset-0 w-full h-full object-contain p-1.5 mix-blend-multiply" />
+              <div key={i.key} className="flex gap-3.5">
+                <div className="w-20 aspect-[4/5] bg-[#F4F4F4] relative shrink-0">
+                  <img src={thumb} alt={i.p.name} className="absolute inset-0 w-full h-full object-contain p-1.5 brightness-[1.06] contrast-[1.04] mix-blend-multiply" />
                 </div>
                 <div className="flex-1 text-xs">
-                  <p className="font-medium">{i.p.name}</p>
-                  <p className="text-black/60 mt-1">{COLORS[i.color].label[lang]} · {i.size}</p>
+                  <div className="flex justify-between items-start gap-2">
+                    <p className="font-semibold">{i.p.name}</p>
+                    <button onClick={() => setQty(i.key, 0)} className="text-black/40 hover:text-ink text-sm leading-none">×</button>
+                  </div>
+                  <p className="mt-1 font-medium">{fmt(i.p.price)} <span className="text-black/50 ml-1">{i.size} · {COLORS[i.color].label[lang]}</span></p>
                   <div className="flex items-center gap-3 mt-3 border border-black/15 w-fit">
                     <button className="w-7 h-7" onClick={() => setQty(i.key, i.qty - 1)}>−</button>
                     <span>{i.qty}</span>
                     <button className="w-7 h-7" onClick={() => setQty(i.key, i.qty + 1)}>+</button>
                   </div>
                 </div>
-                <span className="text-xs font-medium whitespace-nowrap">{fmt(i.p.price * i.qty)}</span>
               </div>
             )
           })}
-        </div>
-        {!!items.length && (
-          <div className="border-t border-black/10 p-5 space-y-4 sticky bottom-0 bg-white">
-            <div>
-              <p className="micro mb-2">Способ доставки</p>
-              {DELIVERY.map((x) => (
-                <label key={x.id} className={`flex items-center justify-between text-xs border px-3 py-2.5 mb-1.5 cursor-pointer ${delivery === x.id ? 'border-ink' : 'border-black/15'}`}>
-                  <span className="flex items-center gap-2">
-                    <input type="radio" className="accent-black" checked={delivery === x.id} onChange={() => setDelivery(x.id)} />{x.label[lang]}
-                  </span>
-                  <span>{fmt(x.price)}</span>
-                </label>
-              ))}
+
+          {/* Блок OTHERS ALSO BOUGHT / С этим покупают */}
+          {suggestions.length > 0 && (
+            <div className="pt-4 border-t border-black/10">
+              <p className="micro text-[10px] mb-3">С ЭТИМ ПОКУПАЮТ</p>
+              <div className="grid grid-cols-3 gap-2">
+                {suggestions.map((sp) => {
+                  const sc = sp.defaultColor || sp.colors[0]
+                  return (
+                    <div key={sp.id} className="bg-[#F4F4F4] p-2 flex flex-col">
+                      <img src={sp.images[sc][0]} alt={sp.name} className="w-full aspect-[4/5] object-contain brightness-[1.06] contrast-[1.04] mix-blend-multiply mb-1.5" />
+                      <p className="text-[10px] font-medium truncate">{sp.name}</p>
+                      <p className="text-[10px] text-black/60 mb-1.5">{fmt(sp.price)}</p>
+                      <button
+                        onClick={() => onAddQuick(sp, sc, 'L')}
+                        className="mt-auto w-full py-1 bg-white border border-black/15 text-[9px] micro hover:bg-ink hover:text-white transition"
+                      >
+                        + Add (L)
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-            <div className="flex justify-between text-sm font-semibold"><span>Итого</span><span>{fmt(total)}</span></div>
-            <button onClick={order} className="w-full h-12 bg-ink text-white micro hover:bg-tur hover:text-ink transition-colors">Оформить заказ в WhatsApp</button>
+          )}
+        </div>
+
+        {!!items.length && (
+          <div className="border-t border-black/10 p-5 space-y-3 sticky bottom-0 bg-white">
+            <div className="bg-[#F8F8F8] p-3 space-y-1.5 text-xs">
+              <div className="flex justify-between text-black/70"><span>Товары</span><span>{fmt(sub)}</span></div>
+              <div className="flex justify-between text-black/70">
+                <span>Доставка ({d.label[lang]})</span>
+                <span>{shipFee === 0 ? 'Бесплатно' : fmt(shipFee)}</span>
+              </div>
+              <div className="flex justify-between font-bold text-sm pt-1 border-t border-black/10">
+                <span>Итого</span><span>{fmt(total)}</span>
+              </div>
+            </div>
+            <button
+              onClick={onCheckout}
+              className="w-full h-12 bg-ink text-white micro hover:bg-tur hover:text-ink transition-colors flex items-center justify-center gap-2"
+            >
+              <span>ОФОРМИТЬ ЗАКАЗ</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+            </button>
+            <div className="flex items-center justify-center gap-2 text-[10px] text-black/55">
+              <span className="px-1.5 py-0.5 border border-black/15">Kaspi QR</span>
+              <span className="px-1.5 py-0.5 border border-black/15">Kaspi RED</span>
+              <span className="px-1.5 py-0.5 border border-black/15">VISA / MC</span>
+              <span className="px-1.5 py-0.5 border border-black/15">WhatsApp</span>
+            </div>
           </div>
         )}
       </div>

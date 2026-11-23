@@ -39,8 +39,8 @@ export default function CatalogPage({
   if (sort === 'desc') list = [...list].sort((a, b) => b.price - a.price)
 
   return (
-    <div className="pt-20 pb-20 max-w-[1440px] mx-auto px-4 md:px-6">
-      <div className="flex items-center justify-between py-4 border-b border-black/10 mb-6">
+    <div className="pt-20 pb-20 px-1 md:px-2">
+      <div className="flex items-center justify-between py-4 px-3 border-b border-black/10 mb-6">
         <button onClick={onBack} className="micro hover:opacity-60">← {t.backToHome}</button>
         <span className="micro text-black/45">TUMARU / {t.avail}</span>
       </div>
@@ -127,7 +127,7 @@ export default function CatalogPage({
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-1 gap-y-10">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-[2px] gap-y-8">
           {list.map((p) => (
             <ProductCard
               key={p.id}

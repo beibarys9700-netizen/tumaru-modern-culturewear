@@ -6,15 +6,17 @@ import SplitBanner from './components/SplitBanner'
 import Footer from './components/Footer'
 import ProductPage from './components/ProductPage'
 import CatalogPage from './components/CatalogPage'
+import CheckoutPage from './components/CheckoutPage'
 import { ProductDrawer, SizeModal, CartDrawer } from './components/Overlays'
 import { PRODUCTS } from './data'
 
 export default function App() {
   const [lang, setLang] = useState('RU')
   const [sel, setSel] = useState(null) // quick-add drawer {p, color}
-  const [view, setView] = useState('home') // 'home' | 'catalog' | 'product'
+  const [view, setView] = useState('home') // 'home' | 'catalog' | 'product' | 'checkout'
   const [page, setPage] = useState(null) // {p, color}
   const [size, setSize] = useState(null)
+  const [recommendedSize, setRecommendedSize] = useState(null)
   const [sizeModal, setSizeModal] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
   const [items, setItems] = useState([])
@@ -36,6 +38,11 @@ export default function App() {
       if (h === '#shop-all') {
         setPage(null)
         setView('catalog')
+        return
+      }
+      if (h === '#checkout') {
+        setPage(null)
+        setView('checkout')
         return
       }
       setPage(null)
@@ -61,10 +68,17 @@ export default function App() {
     window.history.pushState(null, '', '#shop-all')
   }
 
+  const openCheckout = () => {
+    setCartOpen(false)
+    setSel(null)
+    setView('checkout')
+    window.history.pushState(null, '', '#checkout')
+  }
+
   const goHome = () => {
     setPage(null)
     setView('home')
-    if (window.location.hash.startsWith('#product/') || window.location.hash === '#shop-all') {
+    if (window.location.hash) {
       window.history.pushState(null, '', '#')
     }
   }
@@ -78,11 +92,32 @@ export default function App() {
     setCartOpen(true)
   }
 
+  const addSilent = (p, color, sz) => {
+    const key = `${p.id}-${color}-${sz}`
+    setItems((prev) => prev.find((i) => i.key === key)
+      ? prev.map((i) => (i.key === key ? { ...i, qty: i.qty + 1 } : i))
+      : [...prev, { key, p, color, size: sz, qty: 1 }])
+  }
+
   const setQty = (key, q) => setItems((prev) => prev.map((i) => (i.key === key ? { ...i, qty: q } : i)).filter((i) => i.qty > 0))
   const toggleSave = (id) => setSavedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
   const count = items.reduce((s, i) => s + i.qty, 0)
 
   const activeTarget = page?.p || sel?.p
+
+  if (view === 'checkout') {
+    return (
+      <CheckoutPage
+        items={items}
+        lang={lang}
+        delivery={delivery}
+        setDelivery={setDelivery}
+        onAddQuick={addSilent}
+        onBack={goHome}
+        onClearCart={() => setItems([])}
+      />
+    )
+  }
 
   return (
     <>
@@ -107,6 +142,7 @@ export default function App() {
             setColor={(c) => setPage({ ...page, color: c })}
             size={size}
             setSize={setSize}
+            recommendedSize={recommendedSize}
             lang={lang}
             onBack={openCatalog}
             onAdd={add}
@@ -160,8 +196,8 @@ export default function App() {
         open={sizeModal}
         onClose={() => setSizeModal(false)}
         product={activeTarget}
-        onSelectOnly={activeTarget ? (rec) => setSize(rec) : null}
-        onAdd={(p, rec) => add(p, (page?.color || sel?.color || p.defaultColor || p.colors[0]), rec)}
+        onSelectOnly={activeTarget ? (rec) => { setSize(rec); setRecommendedSize(rec) } : null}
+        onAdd={(p, rec) => { setRecommendedSize(rec); add(p, (page?.color || sel?.color || p.defaultColor || p.colors[0]), rec) }}
       />
 
       <CartDrawer
@@ -172,6 +208,8 @@ export default function App() {
         setQty={setQty}
         delivery={delivery}
         setDelivery={setDelivery}
+        onAddQuick={addSilent}
+        onCheckout={openCheckout}
       />
     </>
   )

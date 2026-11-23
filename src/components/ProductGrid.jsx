@@ -32,7 +32,7 @@ export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSa
             src={imgs[0]}
             alt={p.name}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-contain p-2 brightness-[1.06] contrast-[1.04] mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
+            className="absolute inset-0 w-full h-full object-contain p-1 brightness-[1.06] contrast-[1.04] mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
           />
         )}
         <button
@@ -52,7 +52,7 @@ export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSa
           +
         </button>
       </div>
-      <div className="pt-3 px-2">
+      <div className="pt-3 px-2.5">
         <p className="micro text-[9px] text-black/60 flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 bg-tur inline-block" />{t.inStock}
         </p>
@@ -87,27 +87,27 @@ export default function ProductGrid({ lang, onOpenPage, onQuickAdd, savedIds, on
 
   const scroll = (dir) => {
     if (!scroller.current) return
-    const step = scroller.current.clientWidth * 0.6
+    const step = scroller.current.clientWidth * 0.5
     scroller.current.scrollBy({ left: dir * step, behavior: 'smooth' })
   }
 
   return (
-    <section id="shop" className="py-10 md:py-14 relative group/row">
-      <div className="flex items-center justify-between px-4 md:px-6 mb-4">
+    <section id="shop" className="py-10 md:py-12 relative">
+      <div className="flex items-center justify-between px-3 md:px-4 mb-3">
         <h2 className="micro">{t.avail}</h2>
-        <div className="hidden md:flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-1.5">
           <button onClick={() => scroll(-1)} aria-label="Назад" className="w-8 h-8 border border-black/15 flex items-center justify-center hover:bg-ink hover:text-white transition-colors">←</button>
           <button onClick={() => scroll(1)} aria-label="Вперёд" className="w-8 h-8 border border-black/15 flex items-center justify-center hover:bg-ink hover:text-white transition-colors">→</button>
         </div>
       </div>
 
-      {/* Горизонтальный скролл во всю ширину экрана (как на representclo.com) */}
+      {/* Большие карточки от края до края с минимальным зазором (2px) как на representclo.com */}
       <div
         ref={scroller}
-        className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-[2px] md:gap-1 px-0"
+        className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-[2px]"
       >
         {PRODUCTS.map((p) => (
-          <div key={p.id} className="w-[47vw] sm:w-[32vw] lg:w-[21.5vw] shrink-0 snap-start">
+          <div key={p.id} className="w-[49vw] sm:w-[33vw] lg:w-[24.85vw] shrink-0 snap-start">
             <ProductCard
               p={p}
               lang={lang}
