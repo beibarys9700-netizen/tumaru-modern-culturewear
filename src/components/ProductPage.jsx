@@ -67,7 +67,7 @@ export default function ProductPage({
               <img
                 src={imgs[imgIdx] || imgs[0]}
                 alt={product.name}
-                className="w-full h-full object-contain p-6 mix-blend-multiply"
+                className="w-full h-full object-contain p-6 brightness-[1.06] contrast-[1.04] mix-blend-multiply"
               />
               <button
                 onClick={() => onToggleSave(product.id)}

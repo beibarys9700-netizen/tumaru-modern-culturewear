@@ -127,7 +127,7 @@ export default function CatalogPage({
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 gap-y-10">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-1 gap-y-10">
           {list.map((p) => (
             <ProductCard
               key={p.id}
@@ -144,3 +144,4 @@ export default function CatalogPage({
     </div>
   )
 }
+

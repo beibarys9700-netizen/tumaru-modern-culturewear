@@ -34,7 +34,7 @@ export function ProductDrawer({ sel, lang, onClose, setColor, onAdd, openSize, s
             <img
               src={imgs[imgIdx] || imgs[0]}
               alt={p.name}
-              className="absolute inset-0 w-full h-full object-contain p-3 mix-blend-multiply"
+              className="absolute inset-0 w-full h-full object-contain p-3 brightness-[1.06] contrast-[1.04] mix-blend-multiply"
             />
           </div>
           {imgs.length > 1 && (

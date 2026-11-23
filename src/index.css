@@ -9,3 +9,5 @@ button { cursor: pointer; }
 .glass-btn { @apply uppercase text-[11px] tracking-[0.14em] font-medium text-white px-8 py-3 bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white hover:text-ink transition-colors; }
 .ticker { animation: ticker 40s linear infinite; }
 @keyframes ticker { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { PRODUCTS, COLORS, fmt, T } from '../data'
 
 export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSave }) {
@@ -9,7 +9,7 @@ export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSa
   return (
     <article className="group">
       <div
-        className="relative aspect-[4/5] bg-card cursor-pointer overflow-hidden"
+        className="relative aspect-[4/5] bg-[#F4F4F4] cursor-pointer overflow-hidden"
         onClick={() => onOpenPage(p, color)}
       >
         {p.isSet ? (
@@ -18,13 +18,13 @@ export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSa
               src={imgs[0]}
               alt={`${p.name} Hoodie`}
               loading="lazy"
-              className="w-full h-full object-contain mix-blend-multiply"
+              className="w-full h-full object-contain brightness-[1.06] contrast-[1.04] mix-blend-multiply"
             />
             <img
               src={imgs[1]}
               alt={`${p.name} Pants`}
               loading="lazy"
-              className="w-full h-full object-contain mix-blend-multiply"
+              className="w-full h-full object-contain brightness-[1.06] contrast-[1.04] mix-blend-multiply"
             />
           </div>
         ) : (
@@ -32,13 +32,13 @@ export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSa
             src={imgs[0]}
             alt={p.name}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-contain mix-blend-multiply scale-[1.03] transition-transform duration-500 group-hover:scale-[1.08]"
+            className="absolute inset-0 w-full h-full object-contain p-2 brightness-[1.06] contrast-[1.04] mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
           />
         )}
         <button
           aria-label="В закладки"
           onClick={(e) => { e.stopPropagation(); onToggleSave(p.id) }}
-          className="absolute top-3 right-3 z-10"
+          className="absolute top-3 right-3 z-10 opacity-80 hover:opacity-100"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill={saved ? '#0A0A0A' : 'none'} stroke="#0A0A0A" strokeWidth="1.5">
             <path d="M6 3h12v18l-6-4-6 4V3Z" />
@@ -47,23 +47,23 @@ export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSa
         <button
           aria-label="Быстро добавить"
           onClick={(e) => { e.stopPropagation(); onQuickAdd(p, color) }}
-          className="absolute bottom-3 right-3 z-10 w-7 h-7 flex items-center justify-center text-lg hover:bg-ink hover:text-white transition-colors"
+          className="absolute bottom-2.5 right-2.5 z-10 w-7 h-7 flex items-center justify-center text-lg text-ink/75 hover:bg-ink hover:text-white transition-colors"
         >
           +
         </button>
       </div>
-      <div className="pt-3 px-0.5">
+      <div className="pt-3 px-2">
         <p className="micro text-[9px] text-black/60 flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 bg-tur inline-block" />{t.inStock}
         </p>
         <div
-          className="flex justify-between gap-3 mt-1.5 text-[12px] font-medium cursor-pointer"
+          className="flex justify-between gap-2 mt-1.5 text-[12px] font-medium cursor-pointer"
           onClick={() => onOpenPage(p, color)}
         >
-          <h3 className="leading-tight hover:underline underline-offset-4">{p.name}</h3>
+          <h3 className="leading-tight hover:underline underline-offset-4 truncate">{p.name}</h3>
           <span className="whitespace-nowrap">{fmt(p.price)}</span>
         </div>
-        <div className="flex items-center gap-2 mt-2.5">
+        <div className="flex items-center gap-2 mt-2">
           {p.colors.map((c) => (
             <button
               key={c}
@@ -74,7 +74,7 @@ export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSa
               style={{ background: COLORS[c].hex }}
             />
           ))}
-          <span className="micro text-[9px] text-black/50 ml-1">{COLORS[color].label[lang]}</span>
+          <span className="micro text-[9px] text-black/50 ml-1 truncate">{COLORS[color].label[lang]}</span>
         </div>
       </div>
     </article>
@@ -83,26 +83,44 @@ export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSa
 
 export default function ProductGrid({ lang, onOpenPage, onQuickAdd, savedIds, onToggleSave, openCatalog }) {
   const t = T[lang]
-  // На главной показываем ровно 4 основных товара без дублей (Худи бордо, Брюки, Худи оникс, Джинсы)
-  const homeItems = PRODUCTS.filter((x) => !x.isSet)
+  const scroller = useRef(null)
+
+  const scroll = (dir) => {
+    if (!scroller.current) return
+    const step = scroller.current.clientWidth * 0.6
+    scroller.current.scrollBy({ left: dir * step, behavior: 'smooth' })
+  }
 
   return (
-    <section id="shop" className="px-4 md:px-6 py-14 max-w-[1440px] mx-auto">
-      <h2 className="micro mb-6">{t.avail}</h2>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 gap-y-10">
-        {homeItems.map((p) => (
-          <ProductCard
-            key={p.id}
-            p={p}
-            lang={lang}
-            onOpenPage={onOpenPage}
-            onQuickAdd={onQuickAdd}
-            saved={savedIds.includes(p.id)}
-            onToggleSave={onToggleSave}
-          />
+    <section id="shop" className="py-10 md:py-14 relative group/row">
+      <div className="flex items-center justify-between px-4 md:px-6 mb-4">
+        <h2 className="micro">{t.avail}</h2>
+        <div className="hidden md:flex items-center gap-2">
+          <button onClick={() => scroll(-1)} aria-label="Назад" className="w-8 h-8 border border-black/15 flex items-center justify-center hover:bg-ink hover:text-white transition-colors">←</button>
+          <button onClick={() => scroll(1)} aria-label="Вперёд" className="w-8 h-8 border border-black/15 flex items-center justify-center hover:bg-ink hover:text-white transition-colors">→</button>
+        </div>
+      </div>
+
+      {/* Горизонтальный скролл во всю ширину экрана (как на representclo.com) */}
+      <div
+        ref={scroller}
+        className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-[2px] md:gap-1 px-0"
+      >
+        {PRODUCTS.map((p) => (
+          <div key={p.id} className="w-[47vw] sm:w-[32vw] lg:w-[21.5vw] shrink-0 snap-start">
+            <ProductCard
+              p={p}
+              lang={lang}
+              onOpenPage={onOpenPage}
+              onQuickAdd={onQuickAdd}
+              saved={savedIds.includes(p.id)}
+              onToggleSave={onToggleSave}
+            />
+          </div>
         ))}
       </div>
-      <div className="flex justify-center mt-12">
+
+      <div className="flex justify-center mt-10">
         <button onClick={openCatalog} className="micro border-b border-ink pb-1 hover:opacity-60">
           → {t.all}
         </button>
