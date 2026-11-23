@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html { scroll-behavior: smooth; }
+body { @apply font-sans bg-white text-ink antialiased; letter-spacing: -0.005em; }
+button { cursor: pointer; }
+.micro { @apply uppercase text-[10px] tracking-[0.14em] font-medium; }
+.glass-btn { @apply uppercase text-[11px] tracking-[0.14em] font-medium text-white px-8 py-3 bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white hover:text-ink transition-colors; }
+.ticker { animation: ticker 40s linear infinite; }
+@keyframes ticker { from { transform: translateX(0) } to { transform: translateX(-50%) } }
