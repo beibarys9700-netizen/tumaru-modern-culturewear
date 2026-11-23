@@ -53,6 +53,11 @@ export const SPECS = {
     KZ: '320 г/м² тығыз трикотаж',
     EN: 'Heavyweight knit, 320 GSM',
   },
+  fit: {
+    RU: 'Фирменный свободный крой Tumaru (Relaxed / Boxy)',
+    KZ: 'Tumaru еркін пішімі (Relaxed / Boxy)',
+    EN: 'Signature Tumaru relaxed boxy fit',
+  },
 }
 
 export const PRODUCTS = [
@@ -60,9 +65,16 @@ export const PRODUCTS = [
     id: 1,
     name: 'TUMARU ZIP HOODIE',
     subtitle: { RU: 'Зип-худи', KZ: 'Зип-худи', EN: 'Heavyweight Zip Hoodie' },
+    description: {
+      RU: 'Плотное зип-худи из премиального футера 320 г/м² с фирменной вышивкой на груди и этническим орнаментом на капюшоне.',
+      KZ: 'Кеудесінде фирмалық кестесі және капюшонында ұлттық ою-өрнегі бар 320 г/м² тығыз трикотаж зип-худи.',
+      EN: 'Heavyweight 320 GSM zip hoodie featuring signature chest embroidery and traditional geometric hood trim.',
+    },
     price: 29900,
     colors: ['burgundy', 'black'],
     defaultColor: 'burgundy',
+    relatedIds: [2, 3, 4],
+    pairId: 2,
     images: {
       burgundy: HOODIE_BURGUNDY_IMAGES,
       black: HOODIE_BLACK_IMAGES,
@@ -72,9 +84,16 @@ export const PRODUCTS = [
     id: 2,
     name: 'TUMARU PANTS',
     subtitle: { RU: 'Брюки прямого кроя', KZ: 'Брюки', EN: 'Wide Sweatpants' },
+    description: {
+      RU: 'Широкие брюки прямого кроя из плотного трикотажа 320 г/м² с этнической отделкой заднего кармана.',
+      KZ: 'Артқы қалтасында этникалық өрнегі бар 320 г/м² тығыз трикотаждан тігілген кең шалбар.',
+      EN: 'Relaxed wide-leg sweatpants crafted from 320 GSM heavyweight knit with woven ethnic back-pocket detail.',
+    },
     price: 24900,
     colors: ['burgundy'],
     defaultColor: 'burgundy',
+    relatedIds: [1, 3, 4],
+    pairId: 1,
     images: {
       burgundy: PANTS_BURGUNDY_IMAGES,
     },
@@ -83,9 +102,16 @@ export const PRODUCTS = [
     id: 3,
     name: 'TUMARU ZIP HOODIE — ONYX',
     subtitle: { RU: 'Зип-худи (Чёрный)', KZ: 'Зип-худи (Қара)', EN: 'Zip Hoodie (Black)' },
+    description: {
+      RU: 'Глубокий чёрный оттенок Onyx с бирюзовым орнаментом капюшона. Плотность 320 г/м², двойная металлическая молния.',
+      KZ: 'Капюшонында көгілдір ою-өрнегі бар терең қара Onyx зип-худи. Тығыздығы 320 г/м².',
+      EN: 'Deep Onyx black zip hoodie accented with turquoise geometric hood trim. 320 GSM heavyweight cotton blend.',
+    },
     price: 29900,
     colors: ['black', 'burgundy'],
     defaultColor: 'black',
+    relatedIds: [2, 1, 4],
+    pairId: 2,
     images: {
       black: HOODIE_BLACK_IMAGES,
       burgundy: HOODIE_BURGUNDY_IMAGES,
@@ -94,16 +120,26 @@ export const PRODUCTS = [
   {
     id: 4,
     name: 'TUMARU FULL SET',
-    subtitle: { RU: 'Худи + Брюки', KZ: 'Худи + Брюки', EN: 'Hoodie + Pants Set' },
+    subtitle: { RU: 'Полный костюм (Худи + Брюки)', KZ: 'Толық жиынтық (Худи + Брюки)', EN: 'Full Tracksuit Set (Hoodie + Pants)' },
+    description: {
+      RU: 'Готовый образ из коллекции Autumn ’26 / Winter ’27: зип-худи и брюки в едином цвете Burgundy из плотного трикотажа 320 г/м².',
+      KZ: 'Autumn ’26 / Winter ’27 топтамасының дайын жиынтығы: қою қызыл түсті зип-худи мен шалбар, 320 г/м².',
+      EN: 'Complete Autumn ’26 / Winter ’27 uniform pairing our 320 GSM Zip Hoodie and Wide Sweatpants in Burgundy.',
+    },
     price: 54800,
+    isSet: true,
     colors: ['burgundy'],
     defaultColor: 'burgundy',
+    relatedIds: [1, 2, 3],
+    pairId: 3,
     images: {
       burgundy: [
-        '/products/hoodie1/07-ghost.jpg',
+        '/products/hoodie1/08-layout.jpg',
         '/products/pants/01-front.jpg',
-        '/products/hoodie1/02-oversized.jpg',
+        '/products/hoodie1/07-ghost.jpg',
         '/products/pants/07-ghost.jpg',
+        '/products/hoodie1/02-oversized.jpg',
+        '/products/pants/04-fabric.jpg',
       ],
     },
   },
@@ -117,8 +153,17 @@ export const DELIVERY = [
 
 export const fmt = (n) => n.toLocaleString('ru-RU').replace(/\u00a0/g, ' ') + ' ₸'
 
-export function recommendSize(height, weight) {
-  const score = weight + (height - 170) * 0.5
+export function recommendSize(height, weight, opts = {}) {
+  const { gender = 'men', chest = 'avg', stomach = 'avg', hips = 'avg', fit = 'as_cut' } = opts
+  let score = weight + (height - 170) * 0.48
+  if (gender === 'women') score -= 4
+  if (chest === 'fuller') score += 3.5
+  if (chest === 'narrow') score -= 2.5
+  if (stomach === 'fuller') score += 3
+  if (stomach === 'narrow') score -= 1.5
+  if (hips === 'fuller') score += 2.5
+  if (fit === 'close') score -= 5
+  if (fit === 'relaxed') score += 6
   if (score < 62) return 'S'
   if (score < 76) return 'M'
   if (score < 92) return 'L'
@@ -134,13 +179,20 @@ export const T = {
     community: 'COMMUNITY',
     size: 'ПОДБОР РАЗМЕРА',
     view: 'СМОТРЕТЬ ДРОП',
+    findSize: 'ПОДОБРАТЬ РАЗМЕР',
     look: 'LOOKBOOK',
     avail: 'AVAILABLE NOW',
     all: 'СМОТРЕТЬ ВСЕ В НАЛИЧИИ',
     inStock: 'В НАЛИЧИИ',
     compLabel: 'Состав',
     fabLabel: 'Ткань',
+    fitLabel: 'Посадка',
     colorLabel: 'Цвет',
+    backToShop: 'Назад в каталог',
+    completeLook: 'ДОКУПИТЬ ВМЕСТЕ',
+    youMayLike: 'ВАМ ТАКЖЕ ПОНРАВИТСЯ',
+    addToBag: 'Добавить в корзину',
+    chooseSize: 'Выберите размер',
   },
   KZ: {
     shop: 'SHOP',
@@ -148,13 +200,20 @@ export const T = {
     community: 'COMMUNITY',
     size: 'ӨЛШЕМДІ ТАҢДАУ',
     view: 'ДРОПТЫ КӨРУ',
+    findSize: 'ӨЛШЕМДІ ТАҢДАУ',
     look: 'LOOKBOOK',
     avail: 'ҚОЛДА БАР',
     all: 'БАРЛЫҒЫН КӨРУ',
     inStock: 'ҚОЛДА БАР',
     compLabel: 'Құрамы',
     fabLabel: 'Матасы',
+    fitLabel: 'Пішімі',
     colorLabel: 'Түсі',
+    backToShop: 'Каталогқа оралу',
+    completeLook: 'БІРГЕ АЛУ',
+    youMayLike: 'СІЗГЕ ҰНАУЫ МҮМКІН',
+    addToBag: 'Себетке қосу',
+    chooseSize: 'Өлшемді таңдаңыз',
   },
   EN: {
     shop: 'SHOP',
@@ -162,12 +221,19 @@ export const T = {
     community: 'COMMUNITY',
     size: 'SIZE FINDER',
     view: 'SHOP THE DROP',
+    findSize: 'FIND YOUR SIZE',
     look: 'LOOKBOOK',
     avail: 'AVAILABLE NOW',
     all: 'SHOP ALL IN STOCK',
     inStock: 'IN STOCK',
     compLabel: 'Composition',
     fabLabel: 'Fabric',
+    fitLabel: 'Fit',
     colorLabel: 'Color',
+    backToShop: 'Back to shop',
+    completeLook: 'COMPLETE THE LOOK',
+    youMayLike: 'YOU MAY ALSO LIKE',
+    addToBag: 'Add to Bag',
+    chooseSize: 'Select a Size',
   },
 }

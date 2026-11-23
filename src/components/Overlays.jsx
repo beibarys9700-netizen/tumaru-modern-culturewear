@@ -89,7 +89,7 @@ export function ProductDrawer({ sel, lang, onClose, setColor, onAdd, openSize, s
           </div>
           <button disabled={!size} onClick={onAdd}
             className="w-full mt-6 h-12 bg-ink text-white micro disabled:opacity-30">
-            {size ? 'Добавить в корзину' : 'Выберите размер'}
+            {size ? t.addToBag : t.chooseSize}
           </button>
         </div>
       )}
@@ -97,40 +97,214 @@ export function ProductDrawer({ sel, lang, onClose, setColor, onAdd, openSize, s
   )
 }
 
-export function SizeModal({ open, onClose, product, onAdd }) {
-  const [h, setH] = useState('')
-  const [w, setW] = useState('')
+export function SizeModal({ open, onClose, product, onAdd, onSelectOnly }) {
+  const [step, setStep] = useState(1)
+  const [gender, setGender] = useState('men')
+  const [h, setH] = useState(175)
+  const [w, setW] = useState(72)
+  const [chest, setChest] = useState('avg')
+  const [stomach, setStomach] = useState('avg')
+  const [hips, setHips] = useState('avg')
+  const [fit, setFit] = useState('as_cut')
   const [pid, setPid] = useState(PRODUCTS[0].id)
-  const valid = h >= 140 && h <= 220 && w >= 35 && w <= 180
-  const rec = valid ? recommendSize(+h, +w) : null
-  const target = product || PRODUCTS.find((x) => x.id === +pid)
+
+  useEffect(() => {
+    if (open) setStep(1)
+    if (product) setPid(product.id)
+  }, [open, product])
+
   if (!open) return null
+
+  const target = product || PRODUCTS.find((x) => x.id === +pid)
+  const thumb = target.images[target.defaultColor || target.colors[0]][0]
+  const rec = recommendSize(h, w, { gender, chest, stomach, hips, fit })
+
+  const ShapeRow = ({ label, val, setVal }) => (
+    <div>
+      <p className="text-xs font-semibold mb-2">{label}</p>
+      <div className="grid grid-cols-3 gap-2">
+        {[['narrow', 'Узкие'], ['avg', 'Средние'], ['fuller', 'Широкие']].map(([k, txt]) => (
+          <button
+            key={k}
+            onClick={() => setVal(k)}
+            className={`h-11 border text-xs transition ${val === k ? 'border-2 border-ink bg-card font-semibold' : 'border-black/15 hover:border-black/40'}`}
+          >
+            {txt}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
-      <div onClick={onClose} className="absolute inset-0 bg-black/50" />
-      <div className="relative bg-white w-full max-w-md p-6">
-        <button onClick={onClose} className="absolute top-3 right-4 text-xl">×</button>
-        <h3 className="micro mb-1">Умный подбор размера</h3>
-        <p className="text-xs text-black/60 mb-5">Введите рост и вес — мы учтём фирменную свободную посадку Tumaru.</p>
-        <div className="grid grid-cols-2 gap-3">
-          {[['Рост, см', h, setH], ['Вес, кг', w, setW]].map(([l, v, set]) => (
-            <label key={l} className="block micro text-[9px]">{l}
-              <input type="number" value={v} onChange={(e) => set(e.target.value)} className="mt-1 w-full border border-black/20 h-11 px-3 text-sm normal-case tracking-normal outline-none focus:border-ink" />
-            </label>
-          ))}
+      <div onClick={onClose} className="absolute inset-0 bg-black/50 backdrop-blur-xs" />
+      <div className="relative bg-white w-full max-w-[440px] max-h-[92vh] flex flex-col overflow-hidden border border-black/10">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 h-13 py-3.5 border-b border-black/10">
+          <span className="micro tracking-[0.18em]">SIZE ADVISOR</span>
+          <button onClick={onClose} className="text-xl leading-none" aria-label="Закрыть">×</button>
         </div>
-        {!product && (
-          <select value={pid} onChange={(e) => setPid(e.target.value)} className="mt-3 w-full border border-black/20 h-11 px-3 text-xs">
-            {PRODUCTS.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
-          </select>
-        )}
-        <div className="mt-5 min-h-[72px] bg-card flex items-center justify-center text-center px-4 text-sm">
-          {rec ? <span>Рекомендуем <b className="text-xl border-b-2 border-tur">{rec}</b> для фирменной свободной посадки Tumaru</span>
-            : <span className="text-black/40 text-xs">Рост 140–220 см, вес 35–180 кг</span>}
+
+        <div className="p-5 overflow-y-auto flex-1">
+          {/* Карточка выбранного товара */}
+          <div className="flex items-center gap-3 bg-[#F6F5F2] p-2.5 mb-4">
+            <img src={thumb} alt={target.name} className="w-11 h-11 object-contain bg-white mix-blend-multiply p-0.5 shrink-0" />
+            <div className="flex-1 min-w-0">
+              {!product ? (
+                <select value={pid} onChange={(e) => setPid(e.target.value)} className="w-full bg-transparent text-xs font-semibold outline-none">
+                  {PRODUCTS.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
+                </select>
+              ) : (
+                <p className="text-xs font-semibold truncate">{target.name}</p>
+              )}
+              <p className="text-xs text-black/60">{fmt(target.price)}</p>
+            </div>
+          </div>
+
+          {/* 3-step progress bar */}
+          <div className="grid grid-cols-3 gap-1.5 mb-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className={`h-0.5 ${step >= i ? 'bg-ink' : 'bg-black/15'}`} />
+            ))}
+          </div>
+          <p className="text-[11px] text-black/55 mb-4">
+            {step <= 3 ? `Шаг ${step} из 3 · ${step === 1 ? 'Параметры' : step === 2 ? 'Телосложение' : 'Посадка'}` : 'Ваша рекомендация'}
+          </p>
+
+          {step === 1 && (
+            <div className="space-y-5">
+              <div>
+                <h3 className="text-xl font-bold tracking-tight">Подберём ваш идеальный размер</h3>
+                <p className="text-xs text-black/60 mt-1">Укажите пол, рост и вес — это займёт 10 секунд.</p>
+              </div>
+              <div className="grid grid-cols-2 border border-black/15">
+                {[['women', 'WOMENSWEAR'], ['men', 'MENSWEAR']].map(([k, l]) => (
+                  <button
+                    key={k}
+                    onClick={() => setGender(k)}
+                    className={`h-11 micro text-[10px] ${gender === k ? 'bg-ink text-white' : 'bg-white text-black/70'}`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+
+              <div>
+                <div className="flex justify-between items-baseline mb-2">
+                  <span className="micro text-[10px] text-black/55">РОСТ</span>
+                  <span className="text-2xl font-bold">{h} <span className="text-xs font-normal text-black/60">см</span></span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => setH((v) => Math.max(145, v - 1))} className="w-8 h-8 border border-black/20 rounded-full flex items-center justify-center">−</button>
+                  <input type="range" min={145} max={210} value={h} onChange={(e) => setH(+e.target.value)} className="flex-1 accent-black" />
+                  <button onClick={() => setH((v) => Math.min(210, v + 1))} className="w-8 h-8 border border-black/20 rounded-full flex items-center justify-center">+</button>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between items-baseline mb-2">
+                  <span className="micro text-[10px] text-black/55">ВЕС</span>
+                  <span className="text-2xl font-bold">{w} <span className="text-xs font-normal text-black/60">кг</span></span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => setW((v) => Math.max(40, v - 1))} className="w-8 h-8 border border-black/20 rounded-full flex items-center justify-center">−</button>
+                  <input type="range" min={40} max={150} value={w} onChange={(e) => setW(+e.target.value)} className="flex-1 accent-black" />
+                  <button onClick={() => setW((v) => Math.min(150, v + 1))} className="w-8 h-8 border border-black/20 rounded-full flex items-center justify-center">+</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-xl font-bold tracking-tight">Ваше телосложение</h3>
+                <p className="text-xs text-black/60 mt-1">По сравнению с людьми вашего роста и веса.</p>
+              </div>
+              <ShapeRow label="Грудь / Плечи" val={chest} setVal={setChest} />
+              <ShapeRow label="Талия / Живот" val={stomach} setVal={setStomach} />
+              <ShapeRow label="Бёдра" val={hips} setVal={setHips} />
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-xl font-bold tracking-tight">Как вы любите посадку?</h3>
+                <p className="text-xs text-black/60 mt-1">Учтём фирменный крой Tumaru.</p>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {[['close', 'Плотнее'], ['as_cut', 'По крою'], ['relaxed', 'Свободнее']].map(([k, txt]) => (
+                  <button
+                    key={k}
+                    onClick={() => setFit(k)}
+                    className={`h-12 border text-xs transition ${fit === k ? 'border-2 border-ink bg-card font-semibold' : 'border-black/15 hover:border-black/40'}`}
+                  >
+                    {txt}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-black/55">
+                {fit === 'as_cut' && 'Оригинальная свободная посадка, заложенная в лекалах Tumaru.'}
+                {fit === 'close' && 'Более собранный силуэт ближе к телу.'}
+                {fit === 'relaxed' && 'Максимальный оверсайз-эффект.'}
+              </p>
+            </div>
+          )}
+
+          {step === 4 && (
+            <div className="text-center py-2 space-y-5">
+              <h3 className="text-xl font-bold tracking-tight">Ваш размер</h3>
+              <div className="w-32 h-32 mx-auto rounded-full border-[6px] border-tur flex flex-col items-center justify-center">
+                <span className="text-4xl font-extrabold leading-none">{rec}</span>
+                <span className="text-[11px] text-black/60 mt-1">Best fit</span>
+              </div>
+              <div className="bg-[#F6F5F2] p-3.5 text-xs text-black/80 text-left">
+                Размер <b>{rec}</b> оптимально сядет при росте {h} см и весе {w} кг с учётом фирменной посадки Tumaru.
+              </div>
+            </div>
+          )}
         </div>
-        <button disabled={!rec} onClick={() => { onAdd(target, rec); onClose() }} className="w-full mt-4 h-12 bg-ink text-white micro disabled:opacity-30">
-          Добавить {rec || ''} в корзину
-        </button>
+
+        {/* Footer buttons */}
+        <div className="p-5 pt-3 border-t border-black/10 space-y-2">
+          {step < 3 && (
+            <button onClick={() => setStep((s) => s + 1)} className="w-full h-12 bg-ink text-white micro">
+              Продолжить →
+            </button>
+          )}
+          {step === 3 && (
+            <button onClick={() => setStep(4)} className="w-full h-12 bg-ink text-white micro">
+              Показать мой размер
+            </button>
+          )}
+          {step === 4 && (
+            <>
+              <button
+                onClick={() => { onAdd(target, rec); onClose() }}
+                className="w-full h-12 bg-ink text-white micro hover:bg-tur hover:text-ink transition-colors"
+              >
+                Добавить размер {rec} в корзину
+              </button>
+              <div className="flex justify-center gap-6 pt-1">
+                {onSelectOnly && (
+                  <button onClick={() => { onSelectOnly(rec); onClose() }} className="micro text-[10px] underline underline-offset-4">
+                    Выбрать {rec} на странице
+                  </button>
+                )}
+                <button onClick={() => setStep(1)} className="micro text-[10px] text-black/60 hover:text-ink">
+                  Изменить параметры
+                </button>
+              </div>
+            </>
+          )}
+          {step > 1 && step < 4 && (
+            <button onClick={() => setStep((s) => s - 1)} className="w-full h-11 border border-black/20 micro text-[10px]">
+              Назад
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )
