@@ -168,11 +168,11 @@ export default function ProductPage({
           <div className="mt-6 border-t border-black/10 pt-4 space-y-2 text-xs text-black/80">
             <div className="flex justify-between">
               <span className="text-black/50">{t.compLabel}</span>
-              <span className="font-medium">{SPECS.composition[lang]}</span>
+              <span className="font-medium">{product.isDenim ? SPECS.denimComposition[lang] : SPECS.composition[lang]}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-black/50">{t.fabLabel}</span>
-              <span className="font-medium">{SPECS.fabric[lang]}</span>
+              <span className="font-medium">{product.isDenim ? SPECS.denimFabric[lang] : SPECS.fabric[lang]}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-black/50">{t.fitLabel}</span>
@@ -247,3 +247,4 @@ export default function ProductPage({
     </div>
   )
 }
+

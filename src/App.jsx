@@ -5,13 +5,15 @@ import ProductGrid from './components/ProductGrid'
 import SplitBanner from './components/SplitBanner'
 import Footer from './components/Footer'
 import ProductPage from './components/ProductPage'
+import CatalogPage from './components/CatalogPage'
 import { ProductDrawer, SizeModal, CartDrawer } from './components/Overlays'
 import { PRODUCTS } from './data'
 
 export default function App() {
   const [lang, setLang] = useState('RU')
   const [sel, setSel] = useState(null) // quick-add drawer {p, color}
-  const [page, setPage] = useState(null) // full product page {p, color}
+  const [view, setView] = useState('home') // 'home' | 'catalog' | 'product'
+  const [page, setPage] = useState(null) // {p, color}
   const [size, setSize] = useState(null)
   const [sizeModal, setSizeModal] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
@@ -21,13 +23,23 @@ export default function App() {
 
   useEffect(() => {
     const syncHash = () => {
-      const m = window.location.hash.match(/^#product\/(\d+)/)
+      const h = window.location.hash
+      const m = h.match(/^#product\/(\d+)/)
       if (m) {
         const found = PRODUCTS.find((x) => x.id === +m[1])
-        if (found) setPage({ p: found, color: found.defaultColor || found.colors[0] })
-      } else {
-        setPage(null)
+        if (found) {
+          setPage({ p: found, color: found.defaultColor || found.colors[0] })
+          setView('product')
+          return
+        }
       }
+      if (h === '#shop-all') {
+        setPage(null)
+        setView('catalog')
+        return
+      }
+      setPage(null)
+      setView('home')
     }
     syncHash()
     window.addEventListener('hashchange', syncHash)
@@ -38,12 +50,21 @@ export default function App() {
     setSel(null)
     setSize(null)
     setPage({ p, color: color || p.defaultColor || p.colors[0] })
+    setView('product')
     window.history.pushState(null, '', `#product/${p.id}`)
+  }
+
+  const openCatalog = () => {
+    setSel(null)
+    setPage(null)
+    setView('catalog')
+    window.history.pushState(null, '', '#shop-all')
   }
 
   const goHome = () => {
     setPage(null)
-    if (window.location.hash.startsWith('#product/')) {
+    setView('home')
+    if (window.location.hash.startsWith('#product/') || window.location.hash === '#shop-all') {
       window.history.pushState(null, '', '#')
     }
   }
@@ -73,11 +94,12 @@ export default function App() {
         wishCount={savedIds.length}
         openCart={() => setCartOpen(true)}
         openSize={() => setSizeModal(true)}
-        forceSolid={!!page}
+        forceSolid={view !== 'home'}
         goHome={goHome}
+        openCatalog={openCatalog}
       />
 
-      {page ? (
+      {view === 'product' && page ? (
         <main>
           <ProductPage
             product={page.p}
@@ -86,7 +108,7 @@ export default function App() {
             size={size}
             setSize={setSize}
             lang={lang}
-            onBack={goHome}
+            onBack={openCatalog}
             onAdd={add}
             openSize={() => setSizeModal(true)}
             onOpenPage={openProductPage}
@@ -95,15 +117,27 @@ export default function App() {
             onToggleSave={toggleSave}
           />
         </main>
+      ) : view === 'catalog' ? (
+        <main>
+          <CatalogPage
+            lang={lang}
+            onBack={goHome}
+            onOpenPage={openProductPage}
+            onQuickAdd={(p, color) => { setSel({ p, color }); setSize(null) }}
+            savedIds={savedIds}
+            onToggleSave={toggleSave}
+          />
+        </main>
       ) : (
         <main>
-          <Hero lang={lang} openSize={() => setSizeModal(true)} />
+          <Hero lang={lang} openSize={() => setSizeModal(true)} openCatalog={openCatalog} />
           <ProductGrid
             lang={lang}
             onOpenPage={openProductPage}
             onQuickAdd={(p, color) => { setSel({ p, color }); setSize(null) }}
             savedIds={savedIds}
             onToggleSave={toggleSave}
+            openCatalog={openCatalog}
           />
           <SplitBanner />
         </main>

@@ -15,7 +15,7 @@ export function AnnouncementBar() {
   )
 }
 
-export function Header({ lang, setLang, count, wishCount, openCart, openSize, forceSolid, goHome }) {
+export function Header({ lang, setLang, count, wishCount, openCart, openSize, forceSolid, goHome, openCatalog }) {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -30,18 +30,18 @@ export function Header({ lang, setLang, count, wishCount, openCart, openSize, fo
 
   const posClass = solid
     ? 'fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md text-[#0A0A0A] border-b border-neutral-200 transition-all duration-300'
-    : 'absolute top-8 left-0 right-0 z-50 bg-transparent text-white transition-all duration-300'
+    : 'absolute top-8 left-0 right-0 z-50 bg-transparent text-[#0A0A0A] transition-all duration-300'
 
   return (
     <header className={posClass}>
       <div className="max-w-[1440px] mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-4">
         <nav className="hidden md:flex items-center gap-6 micro flex-1">
-          <a href="#shop" onClick={goHome} className="hover:opacity-60">{t.shop}</a>
+          <button onClick={openCatalog} className="hover:opacity-60">{t.shop}</button>
           <a href="#drop" onClick={goHome} className="hover:opacity-60">{t.drop}</a>
           <a href="#community" onClick={goHome} className="hover:opacity-60">{t.community}</a>
         </nav>
         <div className="md:hidden flex-1 micro">
-          <a href="#shop" onClick={goHome}>SHOP</a>
+          <button onClick={openCatalog}>{t.shop}</button>
         </div>
 
         <a
@@ -72,12 +72,12 @@ export function Header({ lang, setLang, count, wishCount, openCart, openSize, fo
             {t.size}
           </button>
 
-          <a href="#shop" onClick={goHome} className="hidden sm:flex items-center gap-1" title="Избранное" aria-label="Избранное">
+          <button onClick={openCatalog} className="hidden sm:flex items-center gap-1" title="Избранное" aria-label="Избранное">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M6 3h12v18l-6-4-6 4V3Z" />
             </svg>
             {wishCount > 0 && <span className="text-[9px] text-tur">{wishCount}</span>}
-          </a>
+          </button>
 
           <a href="https://wa.me/77713630033" target="_blank" rel="noreferrer" className="hidden sm:flex items-center" title="WhatsApp / Кабинет" aria-label="Аккаунт">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">

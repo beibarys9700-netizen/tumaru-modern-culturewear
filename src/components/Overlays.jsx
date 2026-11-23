@@ -69,8 +69,8 @@ export function ProductDrawer({ sel, lang, onClose, setColor, onAdd, openSize, s
           </div>
 
           <div className="mt-4 border-t border-black/10 pt-3 space-y-1 text-xs text-black/75">
-            <p><span className="micro text-[9px] text-black/45 mr-2">{t.compLabel}:</span>{SPECS.composition[lang]}</p>
-            <p><span className="micro text-[9px] text-black/45 mr-2">{t.fabLabel}:</span>{SPECS.fabric[lang]}</p>
+            <p><span className="micro text-[9px] text-black/45 mr-2">{t.compLabel}:</span>{p.isDenim ? SPECS.denimComposition[lang] : SPECS.composition[lang]}</p>
+            <p><span className="micro text-[9px] text-black/45 mr-2">{t.fabLabel}:</span>{p.isDenim ? SPECS.denimFabric[lang] : SPECS.fabric[lang]}</p>
           </div>
 
           <div className="flex justify-between mt-5 mb-2 micro">

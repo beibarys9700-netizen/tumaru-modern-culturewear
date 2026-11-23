@@ -7,6 +7,10 @@ export const COLORS = {
     hex: '#141414',
     label: { RU: 'Чёрный', KZ: 'Қара', EN: 'Black' },
   },
+  washed_black: {
+    hex: '#2C2C2E',
+    label: { RU: 'Выстиранный чёрный', KZ: 'Шайылған қара', EN: 'Washed Black' },
+  },
 }
 
 export const SIZES = ['S', 'M', 'L', 'XL']
@@ -42,6 +46,16 @@ const PANTS_BURGUNDY_IMAGES = [
   '/products/pants/06-ribbing.jpg',
 ]
 
+const JEANS_WASHED_IMAGES = [
+  '/products/jeans/07-ghost.jpg',
+  '/products/jeans/01-front.jpg',
+  '/products/jeans/02-back.jpg',
+  '/products/jeans/03-angled.jpg',
+  '/products/jeans/04-fabric.jpg',
+  '/products/jeans/05-detail.jpg',
+  '/products/jeans/06-ribbing.jpg',
+]
+
 export const SPECS = {
   composition: {
     RU: '95% хлопок • 5% полиэстер',
@@ -53,6 +67,16 @@ export const SPECS = {
     KZ: '320 г/м² тығыз трикотаж',
     EN: 'Heavyweight knit, 320 GSM',
   },
+  denimComposition: {
+    RU: '100% плотный хлопок (Denim)',
+    KZ: '100% тығыз мақта (Denim)',
+    EN: '100% Heavyweight Cotton Denim',
+  },
+  denimFabric: {
+    RU: 'Премиальный деним 14 oz',
+    KZ: 'Премиум деним 14 oz',
+    EN: '14 oz Vintage Wash Denim',
+  },
   fit: {
     RU: 'Фирменный свободный крой Tumaru (Relaxed / Boxy)',
     KZ: 'Tumaru еркін пішімі (Relaxed / Boxy)',
@@ -63,6 +87,7 @@ export const SPECS = {
 export const PRODUCTS = [
   {
     id: 1,
+    category: 'hoodies',
     name: 'TUMARU ZIP HOODIE',
     subtitle: { RU: 'Зип-худи', KZ: 'Зип-худи', EN: 'Heavyweight Zip Hoodie' },
     description: {
@@ -73,7 +98,7 @@ export const PRODUCTS = [
     price: 29900,
     colors: ['burgundy', 'black'],
     defaultColor: 'burgundy',
-    relatedIds: [2, 3, 4],
+    relatedIds: [2, 5, 3, 4],
     pairId: 2,
     images: {
       burgundy: HOODIE_BURGUNDY_IMAGES,
@@ -82,6 +107,7 @@ export const PRODUCTS = [
   },
   {
     id: 2,
+    category: 'pants',
     name: 'TUMARU PANTS',
     subtitle: { RU: 'Брюки прямого кроя', KZ: 'Брюки', EN: 'Wide Sweatpants' },
     description: {
@@ -92,7 +118,7 @@ export const PRODUCTS = [
     price: 24900,
     colors: ['burgundy'],
     defaultColor: 'burgundy',
-    relatedIds: [1, 3, 4],
+    relatedIds: [1, 5, 3, 4],
     pairId: 1,
     images: {
       burgundy: PANTS_BURGUNDY_IMAGES,
@@ -100,6 +126,7 @@ export const PRODUCTS = [
   },
   {
     id: 3,
+    category: 'hoodies',
     name: 'TUMARU ZIP HOODIE — ONYX',
     subtitle: { RU: 'Зип-худи (Чёрный)', KZ: 'Зип-худи (Қара)', EN: 'Zip Hoodie (Black)' },
     description: {
@@ -110,15 +137,36 @@ export const PRODUCTS = [
     price: 29900,
     colors: ['black', 'burgundy'],
     defaultColor: 'black',
-    relatedIds: [2, 1, 4],
-    pairId: 2,
+    relatedIds: [5, 2, 1, 4],
+    pairId: 5,
     images: {
       black: HOODIE_BLACK_IMAGES,
       burgundy: HOODIE_BURGUNDY_IMAGES,
     },
   },
   {
+    id: 5,
+    category: 'denim',
+    isDenim: true,
+    name: 'TUMARU BAGGY DENIM',
+    subtitle: { RU: 'Широкие джинсы', KZ: 'Кең джинсы', EN: 'Baggy Washed Denim' },
+    description: {
+      RU: 'Широкие джинсы свободного кроя из плотного винтажного денима Washed Black с фирменной вышивкой Tumaru у кармана.',
+      KZ: 'Қалтасының жанында Tumaru кестесі бар тығыз Washed Black денимінен тігілген кең джинсы.',
+      EN: 'Relaxed baggy-fit jeans in vintage Washed Black 14 oz denim with signature Tumaru pocket embroidery.',
+    },
+    price: 32900,
+    colors: ['washed_black'],
+    defaultColor: 'washed_black',
+    relatedIds: [3, 1, 2, 4],
+    pairId: 3,
+    images: {
+      washed_black: JEANS_WASHED_IMAGES,
+    },
+  },
+  {
     id: 4,
+    category: 'sets',
     name: 'TUMARU FULL SET',
     subtitle: { RU: 'Полный костюм (Худи + Брюки)', KZ: 'Толық жиынтық (Худи + Брюки)', EN: 'Full Tracksuit Set (Hoodie + Pants)' },
     description: {
@@ -130,8 +178,8 @@ export const PRODUCTS = [
     isSet: true,
     colors: ['burgundy'],
     defaultColor: 'burgundy',
-    relatedIds: [1, 2, 3],
-    pairId: 3,
+    relatedIds: [1, 2, 5, 3],
+    pairId: 5,
     images: {
       burgundy: [
         '/products/hoodie1/08-layout.jpg',
@@ -189,10 +237,13 @@ export const T = {
     fitLabel: 'Посадка',
     colorLabel: 'Цвет',
     backToShop: 'Назад в каталог',
+    backToHome: 'На главную',
     completeLook: 'ДОКУПИТЬ ВМЕСТЕ',
     youMayLike: 'ВАМ ТАКЖЕ ПОНРАВИТСЯ',
     addToBag: 'Добавить в корзину',
     chooseSize: 'Выберите размер',
+    allInStockTitle: 'ВСЕ В НАЛИЧИИ — AUTUMN ’26 / WINTER ’27',
+    allInStockDesc: 'Полная коллекция TUMARU Modern Culturewear, доступная к немедленной отправке из Алматы.',
   },
   KZ: {
     shop: 'SHOP',
@@ -210,10 +261,13 @@ export const T = {
     fitLabel: 'Пішімі',
     colorLabel: 'Түсі',
     backToShop: 'Каталогқа оралу',
+    backToHome: 'Басты бетке',
     completeLook: 'БІРГЕ АЛУ',
     youMayLike: 'СІЗГЕ ҰНАУЫ МҮМКІН',
     addToBag: 'Себетке қосу',
     chooseSize: 'Өлшемді таңдаңыз',
+    allInStockTitle: 'ҚОЛДА БАРЛЫҒЫ — AUTUMN ’26 / WINTER ’27',
+    allInStockDesc: 'Алматыдан жедел жөнелтуге дайын TUMARU Modern Culturewear топтамасы.',
   },
   EN: {
     shop: 'SHOP',
@@ -231,9 +285,12 @@ export const T = {
     fitLabel: 'Fit',
     colorLabel: 'Color',
     backToShop: 'Back to shop',
+    backToHome: 'Back to home',
     completeLook: 'COMPLETE THE LOOK',
     youMayLike: 'YOU MAY ALSO LIKE',
     addToBag: 'Add to Bag',
     chooseSize: 'Select a Size',
+    allInStockTitle: 'AVAILABLE NOW — AUTUMN ’26 / WINTER ’27',
+    allInStockDesc: 'Full TUMARU Modern Culturewear collection ready for immediate dispatch from Almaty.',
   },
 }

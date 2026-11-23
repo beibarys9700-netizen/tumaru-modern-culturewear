@@ -13,7 +13,7 @@ export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSa
         onClick={() => onOpenPage(p, color)}
       >
         {p.isSet ? (
-          <div className="absolute inset-0 grid grid-cols-2 items-center p-2 transition-transform duration-500 group-hover:scale-105">
+          <div className="absolute inset-0 grid grid-cols-2 items-center transition-transform duration-500 group-hover:scale-105">
             <img
               src={imgs[0]}
               alt={`${p.name} Hoodie`}
@@ -32,7 +32,7 @@ export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSa
             src={imgs[0]}
             alt={p.name}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-contain p-3 mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
+            className="absolute inset-0 w-full h-full object-contain mix-blend-multiply scale-[1.03] transition-transform duration-500 group-hover:scale-[1.08]"
           />
         )}
         <button
@@ -47,12 +47,12 @@ export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSa
         <button
           aria-label="Быстро добавить"
           onClick={(e) => { e.stopPropagation(); onQuickAdd(p, color) }}
-          className="absolute bottom-3 right-3 z-10 w-7 h-7 flex items-center justify-center text-lg bg-white/85 hover:bg-ink hover:text-white transition-colors"
+          className="absolute bottom-3 right-3 z-10 w-7 h-7 flex items-center justify-center text-lg hover:bg-ink hover:text-white transition-colors"
         >
           +
         </button>
       </div>
-      <div className="pt-3 px-1">
+      <div className="pt-3 px-0.5">
         <p className="micro text-[9px] text-black/60 flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 bg-tur inline-block" />{t.inStock}
         </p>
@@ -81,13 +81,16 @@ export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSa
   )
 }
 
-export default function ProductGrid({ lang, onOpenPage, onQuickAdd, savedIds, onToggleSave }) {
+export default function ProductGrid({ lang, onOpenPage, onQuickAdd, savedIds, onToggleSave, openCatalog }) {
   const t = T[lang]
+  // На главной показываем ровно 4 основных товара без дублей (Худи бордо, Брюки, Худи оникс, Джинсы)
+  const homeItems = PRODUCTS.filter((x) => !x.isSet)
+
   return (
     <section id="shop" className="px-4 md:px-6 py-14 max-w-[1440px] mx-auto">
       <h2 className="micro mb-6">{t.avail}</h2>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 gap-y-10">
-        {PRODUCTS.map((p) => (
+        {homeItems.map((p) => (
           <ProductCard
             key={p.id}
             p={p}
@@ -100,7 +103,9 @@ export default function ProductGrid({ lang, onOpenPage, onQuickAdd, savedIds, on
         ))}
       </div>
       <div className="flex justify-center mt-12">
-        <a href="#shop" className="micro border-b border-ink pb-1 hover:opacity-60">→ {t.all}</a>
+        <button onClick={openCatalog} className="micro border-b border-ink pb-1 hover:opacity-60">
+          → {t.all}
+        </button>
       </div>
     </section>
   )
