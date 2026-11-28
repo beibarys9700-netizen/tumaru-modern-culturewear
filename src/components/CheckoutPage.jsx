@@ -66,7 +66,7 @@ export default function CheckoutPage({
       shipMethodTitle: 'Способ доставки',
       payTitle: 'Другие способы оплаты',
       havePromo: 'У меня есть промокод',
-      promoPlaceholder: 'Промокод (например TUMARU10)',
+      promoPlaceholder: 'Промокод (например FORMA10)',
       applyBtn: 'Применить',
       discountLabel: 'Скидка',
       completeOrder: 'Дополнить заказ',
@@ -74,7 +74,7 @@ export default function CheckoutPage({
       addForFreeSuffix: '— доставка по РК бесплатно',
       paySubmit: 'Подтвердить заказ',
       successTitle: 'Заказ сформирован',
-      successDesc: 'Мы открыли WhatsApp с готовым заказом. Менеджер TUMARU свяжется с вами в течение пары минут.',
+      successDesc: 'Мы открыли WhatsApp с готовым заказом. Наш менеджер свяжется с вами в течение пары минут.',
       backToStore: 'Вернуться в магазин',
     },
     KZ: {
@@ -93,7 +93,7 @@ export default function CheckoutPage({
       shipMethodTitle: 'Жеткізу тәсілі',
       payTitle: 'Басқа төлем тәсілдері',
       havePromo: 'Менде промокод бар',
-      promoPlaceholder: 'Промокод (мысалы TUMARU10)',
+      promoPlaceholder: 'Промокод (мысалы FORMA10)',
       applyBtn: 'Қолдану',
       discountLabel: 'Жеңілдік',
       completeOrder: 'Тапсырысты толықтыру',
@@ -101,7 +101,7 @@ export default function CheckoutPage({
       addForFreeSuffix: 'қосыңыз — ҚР бойынша жеткізу тегін',
       paySubmit: 'Тапсырысты растау',
       successTitle: 'Тапсырыс қабылданды',
-      successDesc: 'WhatsApp ашылды. TUMARU менеджері бірнеше минут ішінде хабарласады.',
+      successDesc: 'WhatsApp ашылды. Менеджеріміз бірнеше минут ішінде хабарласады.',
       backToStore: 'Дүкенге оралу',
     },
     EN: {
@@ -120,7 +120,7 @@ export default function CheckoutPage({
       shipMethodTitle: 'Shipping Method',
       payTitle: 'Other Payment Methods',
       havePromo: 'I have a promo code',
-      promoPlaceholder: 'Promo code (try TUMARU10)',
+      promoPlaceholder: 'Promo code (try FORMA10)',
       applyBtn: 'Apply',
       discountLabel: 'Discount',
       completeOrder: 'Complete Your Order',
@@ -128,19 +128,20 @@ export default function CheckoutPage({
       addForFreeSuffix: 'more for free Kazakhstan shipping',
       paySubmit: 'Place Order',
       successTitle: 'Order Confirmed',
-      successDesc: 'WhatsApp opened with your order summary. Our Almaty manager will reply within a few minutes.',
+      successDesc: 'WhatsApp opened with your order summary. Our manager will reply within a few minutes.',
       backToStore: 'Back to store',
     },
   }[lang]
 
   const applyPromo = (e) => {
     e.preventDefault()
-    if (promo.trim().toUpperCase() === 'TUMARU10') {
+    const code = promo.trim().toUpperCase()
+    if (code === 'FORMA10' || code === 'ATELIER10' || code === 'WELCOME10') {
       setDiscountPct(10)
-      setPromoMsg('TUMARU10 (−10%) ✓')
+      setPromoMsg(`${code} (−10%) ✓`)
     } else {
       setDiscountPct(0)
-      setPromoMsg('TUMARU10')
+      setPromoMsg('FORMA10')
     }
   }
 
@@ -160,7 +161,7 @@ export default function CheckoutPage({
       (i, n) => `${n + 1}. ${i.p.name} — ${COLORS[i.color].label[lang]}, ${i.size} × ${i.qty} = ${fmt(i.p.price * i.qty)}`
     )
     const msg = [
-      `Заказ TUMARU #${orderNum}`,
+      `Заказ ${BRAND.name} #${orderNum}`,
       '',
       ...lines,
       '',

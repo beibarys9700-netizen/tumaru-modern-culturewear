@@ -76,8 +76,8 @@ export function ProductDrawer({ sel, lang, onClose, setColor, onAdd, openSize, s
             <span className="font-semibold">{t.sizeLabel}</span>
             <button onClick={openSize} className="underline underline-offset-4">{t.size}</button>
           </div>
-          <div className="grid grid-cols-4 gap-2">
-            {SIZES.map((s) => (
+          <div className={`grid ${(p.sizes || SIZES).length > 4 ? 'grid-cols-3' : 'grid-cols-4'} gap-2`}>
+            {(p.sizes || SIZES).map((s) => (
               <button key={s} onClick={() => setSize(s)}
                 className={`h-11 border text-xs font-semibold ${size === s ? 'bg-[var(--color-ink)] text-white border-[var(--color-ink)]' : 'border-black/20 hover:border-[var(--color-ink)]'}`}>{s}</button>
             ))}

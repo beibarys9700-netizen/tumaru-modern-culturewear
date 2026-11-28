@@ -28,6 +28,7 @@ export default function ProductPage({
 }) {
   const t = T[lang]
   const imgs = product.images[color] || product.images[product.colors[0]]
+  const productSizes = product.sizes || SIZES
   const [imgIdx, setImgIdx] = useState(0)
   const [pairSize, setPairSize] = useState('L')
   const [zoomed, setZoomed] = useState(false)
@@ -246,8 +247,8 @@ export default function ProductPage({
               )}
             </div>
 
-            <div className="grid grid-cols-4 border border-black/15 divide-x divide-black/15">
-              {SIZES.map((s) => (
+            <div className={`grid ${productSizes.length > 4 ? 'grid-cols-3 sm:grid-cols-6' : 'grid-cols-4'} border border-black/15 divide-x divide-black/15`}>
+              {productSizes.map((s) => (
                 <button
                   key={s}
                   onClick={() => { setSize(s); setSizeAlert(false) }}

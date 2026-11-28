@@ -8,6 +8,8 @@ const CATS = [
   { id: 'pants', label: { RU: 'Брюки', KZ: 'Шалбарлар', EN: 'Pants' } },
   { id: 'denim', label: { RU: 'Деним', KZ: 'Деним', EN: 'Denim' } },
   { id: 'sets', label: { RU: 'Комплекты', KZ: 'Жиынтықтар', EN: 'Sets' } },
+  { id: 'footwear', label: { RU: 'Обувь', KZ: 'Аяқ киім', EN: 'Footwear' } },
+  { id: 'accessories', label: { RU: 'Аксессуары', KZ: 'Аксессуарлар', EN: 'Accessories' } },
 ]
 
 export default function CatalogPage({
