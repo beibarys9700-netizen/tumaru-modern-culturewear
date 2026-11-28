@@ -5,6 +5,8 @@ import { ProductCard } from './ProductGrid'
 const CATS = [
   { id: 'all', label: { RU: 'Все товары', KZ: 'Барлығы', EN: 'All' } },
   { id: 'hoodies', label: { RU: 'Зип-худи', KZ: 'Зип-худи', EN: 'Zip Hoodies' } },
+  { id: 'jackets', label: { RU: 'Жакеты', KZ: 'Жакеттер', EN: 'Jackets' } },
+  { id: 'dresses', label: { RU: 'Платья', KZ: 'Көйлектер', EN: 'Dresses' } },
   { id: 'pants', label: { RU: 'Брюки', KZ: 'Шалбарлар', EN: 'Pants' } },
   { id: 'denim', label: { RU: 'Деним', KZ: 'Деним', EN: 'Denim' } },
   { id: 'sets', label: { RU: 'Комплекты', KZ: 'Жиынтықтар', EN: 'Sets' } },
@@ -112,7 +114,7 @@ export default function CatalogPage({
 
           {/* Цвет */}
           <div className="flex flex-wrap items-center gap-1.5">
-            {['all', 'burgundy', 'black', 'washed_black'].map((c) => (
+            {['all', 'burgundy', 'black', 'washed_black', 'espresso', 'taupe', 'ivory'].map((c) => (
               <button
                 key={c}
                 onClick={() => setColorFilter(c)}

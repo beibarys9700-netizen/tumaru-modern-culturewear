@@ -61,3 +61,4 @@ export default function SplitBanner({ openCatalog, openSize }) {
     </section>
   )
 }
+
