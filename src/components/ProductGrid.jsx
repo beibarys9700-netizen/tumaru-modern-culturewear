@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { PRODUCTS, COLORS, fmt, T } from '../data'
 
 export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSave }) {
@@ -34,7 +34,7 @@ export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSa
             src={imgs[0]}
             alt={p.name}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-contain p-2 brightness-[1.06] contrast-[1.04] mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
+            className="absolute inset-0 w-full h-full object-contain p-1 brightness-[1.06] contrast-[1.04] mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
           />
         )}
 
@@ -57,17 +57,17 @@ export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSa
         </button>
       </div>
 
-      <div className="pt-3">
+      <div className="pt-3 px-2.5">
         <div
           className="flex justify-between items-start gap-2 text-[14px] font-semibold cursor-pointer"
           onClick={() => onOpenPage(p, color)}
         >
-          <h3 className="leading-snug hover:underline underline-offset-4">{p.name}</h3>
+          <h3 className="leading-snug hover:underline underline-offset-4 truncate">{p.name}</h3>
           <span className="whitespace-nowrap">{fmt(p.price)}</span>
         </div>
-        <p className="text-[13px] text-[var(--color-muted)] mt-0.5">{p.subtitle[lang]}</p>
+        <p className="text-[13px] text-[var(--color-muted)] mt-0.5 truncate">{p.subtitle[lang]}</p>
 
-        <div className="flex items-center gap-2 mt-2.5">
+        <div className="flex items-center gap-2 mt-2">
           {p.colors.map((c) => (
             <button
               key={c}
@@ -80,7 +80,7 @@ export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSa
               style={{ background: COLORS[c].hex }}
             />
           ))}
-          <span className="text-[12px] text-[var(--color-muted)] ml-1">{COLORS[color].label[lang]}</span>
+          <span className="text-[12px] text-[var(--color-muted)] ml-1 truncate">{COLORS[color].label[lang]}</span>
         </div>
       </div>
     </article>
@@ -89,29 +89,47 @@ export function ProductCard({ p, lang, onOpenPage, onQuickAdd, saved, onToggleSa
 
 export default function ProductGrid({ lang, onOpenPage, onQuickAdd, savedIds, onToggleSave, openCatalog }) {
   const t = T[lang]
-  const featured = PRODUCTS.filter((p) => p.featured)
+  const scroller = useRef(null)
+
+  const scroll = (dir) => {
+    if (!scroller.current) return
+    const step = scroller.current.clientWidth * 0.5
+    scroller.current.scrollBy({ left: dir * step, behavior: 'smooth' })
+  }
 
   return (
-    <section id="shop" className="max-w-[1440px] mx-auto px-4 md:px-6 py-12 md:py-16">
-      <div className="flex items-baseline justify-between mb-6">
-        <h2 className="font-display text-xl md:text-2xl font-bold tracking-tight">{t.avail}</h2>
-        <button onClick={openCatalog} className="text-[13px] font-semibold border-b border-[var(--color-ink)] pb-0.5 hover:opacity-65">
-          {t.all} →
-        </button>
+    <section id="shop" className="py-10 md:py-12 relative">
+      <div className="flex items-center justify-between px-4 md:px-6 mb-3">
+        <h2 className="font-display text-lg md:text-xl font-bold tracking-tight">{t.avail}</h2>
+        <div className="hidden md:flex items-center gap-1.5">
+          <button onClick={() => scroll(-1)} aria-label="Назад" className="w-9 h-9 border border-black/15 flex items-center justify-center hover:bg-[var(--color-ink)] hover:text-white transition-colors">←</button>
+          <button onClick={() => scroll(1)} aria-label="Вперёд" className="w-9 h-9 border border-black/15 flex items-center justify-center hover:bg-[var(--color-ink)] hover:text-white transition-colors">→</button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 md:gap-x-4 gap-y-10">
-        {featured.map((p) => (
-          <ProductCard
-            key={p.id}
-            p={p}
-            lang={lang}
-            onOpenPage={onOpenPage}
-            onQuickAdd={onQuickAdd}
-            saved={savedIds.includes(p.id)}
-            onToggleSave={onToggleSave}
-          />
+      {/* Большие карточки от края до края с минимальным зазором (2px) */}
+      <div
+        ref={scroller}
+        className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-[2px]"
+      >
+        {PRODUCTS.map((p) => (
+          <div key={p.id} className="w-[49vw] sm:w-[33vw] lg:w-[24.85vw] shrink-0 snap-start">
+            <ProductCard
+              p={p}
+              lang={lang}
+              onOpenPage={onOpenPage}
+              onQuickAdd={onQuickAdd}
+              saved={savedIds.includes(p.id)}
+              onToggleSave={onToggleSave}
+            />
+          </div>
         ))}
+      </div>
+
+      <div className="flex justify-center mt-10">
+        <button onClick={openCatalog} className="text-[13px] font-semibold border-b border-[var(--color-ink)] pb-1 hover:opacity-65">
+          → {t.all}
+        </button>
       </div>
     </section>
   )

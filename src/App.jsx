@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { AnnouncementBar, Header } from './components/Header'
 import Hero from './components/Hero'
 import ProductGrid from './components/ProductGrid'
+import SplitBanner from './components/SplitBanner'
 import { GuaranteesStrip, ReviewsSection, ShippingAndFaq } from './components/TrustSections'
 import Footer from './components/Footer'
 import ProductPage from './components/ProductPage'
@@ -181,6 +182,7 @@ export default function App() {
             onToggleSave={toggleSave}
             openCatalog={() => openCatalog(false)}
           />
+          <SplitBanner openCatalog={() => openCatalog(false)} openSize={() => setSizeModal(true)} />
           <ReviewsSection lang={lang} />
           <ShippingAndFaq lang={lang} />
         </main>
