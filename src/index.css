@@ -2,12 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
-html { scroll-behavior: smooth; }
-body { @apply font-sans bg-white text-ink antialiased; letter-spacing: -0.005em; }
-button { cursor: pointer; }
-.micro { @apply uppercase text-[10px] tracking-[0.14em] font-medium; }
-.glass-btn { @apply uppercase text-[11px] tracking-[0.14em] font-medium text-white px-8 py-3 bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white hover:text-ink transition-colors; }
-.ticker { animation: ticker 40s linear infinite; }
-@keyframes ticker { from { transform: translateX(0) } to { transform: translateX(-50%) } }
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+:root {
+  --color-bg: #FFFFFF;
+  --color-card: #F4F4F4;
+  --color-ink: #0A0A0A;
+  --color-muted: #525252;
+  --color-accent: #00E5C3;
+  --color-accent-dark: #007A67;
+  --font-display: 'Manrope', sans-serif;
+  --font-body: 'Golos Text', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+}
+
+button {
+  cursor: pointer;
+}
+
+.micro {
+  @apply text-[12px] tracking-[0.06em] font-medium uppercase;
+}
+
+.ticker {
+  animation: ticker 40s linear infinite;
+}
+
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

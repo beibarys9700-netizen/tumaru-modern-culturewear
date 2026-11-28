@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { AnnouncementBar, Header } from './components/Header'
 import Hero from './components/Hero'
 import ProductGrid from './components/ProductGrid'
-import SplitBanner from './components/SplitBanner'
+import { GuaranteesStrip, ReviewsSection, ShippingAndFaq } from './components/TrustSections'
 import Footer from './components/Footer'
 import ProductPage from './components/ProductPage'
 import CatalogPage from './components/CatalogPage'
@@ -12,9 +12,10 @@ import { PRODUCTS } from './data'
 
 export default function App() {
   const [lang, setLang] = useState('RU')
-  const [sel, setSel] = useState(null) // quick-add drawer {p, color}
+  const [sel, setSel] = useState(null)
   const [view, setView] = useState('home') // 'home' | 'catalog' | 'product' | 'checkout'
-  const [page, setPage] = useState(null) // {p, color}
+  const [catalogSavedOnly, setCatalogSavedOnly] = useState(false)
+  const [page, setPage] = useState(null)
   const [size, setSize] = useState(null)
   const [recommendedSize, setRecommendedSize] = useState(null)
   const [sizeModal, setSizeModal] = useState(false)
@@ -61,9 +62,10 @@ export default function App() {
     window.history.pushState(null, '', `#product/${p.id}`)
   }
 
-  const openCatalog = () => {
+  const openCatalog = (savedOnly = false) => {
     setSel(null)
     setPage(null)
+    setCatalogSavedOnly(savedOnly)
     setView('catalog')
     window.history.pushState(null, '', '#shop-all')
   }
@@ -77,6 +79,7 @@ export default function App() {
 
   const goHome = () => {
     setPage(null)
+    setCatalogSavedOnly(false)
     setView('home')
     if (window.location.hash) {
       window.history.pushState(null, '', '#')
@@ -121,7 +124,7 @@ export default function App() {
 
   return (
     <>
-      <AnnouncementBar />
+      <AnnouncementBar lang={lang} />
       <Header
         lang={lang}
         setLang={setLang}
@@ -131,7 +134,8 @@ export default function App() {
         openSize={() => setSizeModal(true)}
         forceSolid={view !== 'home'}
         goHome={goHome}
-        openCatalog={openCatalog}
+        openCatalog={() => openCatalog(false)}
+        openSavedCatalog={() => openCatalog(true)}
       />
 
       {view === 'product' && page ? (
@@ -144,7 +148,7 @@ export default function App() {
             setSize={setSize}
             recommendedSize={recommendedSize}
             lang={lang}
-            onBack={openCatalog}
+            onBack={() => openCatalog(false)}
             onAdd={add}
             openSize={() => setSizeModal(true)}
             onOpenPage={openProductPage}
@@ -162,24 +166,27 @@ export default function App() {
             onQuickAdd={(p, color) => { setSel({ p, color }); setSize(null) }}
             savedIds={savedIds}
             onToggleSave={toggleSave}
+            initialSavedOnly={catalogSavedOnly}
           />
         </main>
       ) : (
         <main>
-          <Hero lang={lang} openSize={() => setSizeModal(true)} openCatalog={openCatalog} />
+          <Hero lang={lang} openSize={() => setSizeModal(true)} openCatalog={() => openCatalog(false)} />
+          <GuaranteesStrip lang={lang} />
           <ProductGrid
             lang={lang}
             onOpenPage={openProductPage}
             onQuickAdd={(p, color) => { setSel({ p, color }); setSize(null) }}
             savedIds={savedIds}
             onToggleSave={toggleSave}
-            openCatalog={openCatalog}
+            openCatalog={() => openCatalog(false)}
           />
-          <SplitBanner />
+          <ReviewsSection lang={lang} />
+          <ShippingAndFaq lang={lang} />
         </main>
       )}
 
-      <Footer />
+      <Footer lang={lang} openSize={() => setSizeModal(true)} openCatalog={() => openCatalog(false)} />
 
       <ProductDrawer
         sel={sel}
@@ -194,6 +201,7 @@ export default function App() {
 
       <SizeModal
         open={sizeModal}
+        lang={lang}
         onClose={() => setSizeModal(false)}
         product={activeTarget}
         onSelectOnly={activeTarget ? (rec) => { setSize(rec); setRecommendedSize(rec) } : null}
@@ -207,9 +215,9 @@ export default function App() {
         items={items}
         setQty={setQty}
         delivery={delivery}
-        setDelivery={setDelivery}
         onAddQuick={addSilent}
         onCheckout={openCheckout}
+        onOpenCatalog={() => openCatalog(false)}
       />
     </>
   )

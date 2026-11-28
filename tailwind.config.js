@@ -2,8 +2,17 @@ export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
-      colors: { ink: '#0A0A0A', card: '#F4F4F4', tur: '#00E5C3' },
-      fontFamily: { sans: ['Inter', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'] },
+      colors: {
+        ink: 'var(--color-ink)',
+        card: 'var(--color-card)',
+        tur: 'var(--color-accent)',
+        turDark: 'var(--color-accent-dark)',
+        muted: 'var(--color-muted)',
+      },
+      fontFamily: {
+        sans: ['Golos Text', 'Inter', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        display: ['Manrope', 'Golos Text', 'sans-serif'],
+      },
     },
   },
   plugins: [],
